@@ -1,0 +1,21 @@
+{
+  "name": "UniCompile Universal Compiler",
+  "short_name": "UniCompile",
+  "description": "Premium multi-language online code compiler.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0c",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1150/1150626.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1150/1150626.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
