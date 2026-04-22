@@ -2,8 +2,6 @@
 
 UniCompile is a premium, high-performance, and responsive multi-language online compiler. Built with **Next.js 16**, **Monaco Editor**, and **WebAssembly**, it provides a professional-grade development environment that works both online and offline.
 
-![UniCompile Preview](https://fcruz.org/preview.png) *(Placeholder for your preview image)*
-
 ## ✨ Key Features
 
 -   **🌐 Multi-Language Support**: Compile and run code in C, C++, Python, Java, C#, Go, Rust, PHP, JavaScript, and TypeScript.
