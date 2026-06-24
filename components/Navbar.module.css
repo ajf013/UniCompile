@@ -185,3 +185,14 @@
   .controls { width: 100%; justify-content: space-between; border-top: 1px solid var(--surface-border); padding-top: 0.5rem; margin-top: 0.25rem; }
   .select { flex: 1; max-width: none; }
 }
+
+.collabBtnActive {
+  color: #10b981 !important; /* emerald-500 */
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+.collabBtnActive:hover {
+  background: rgba(16, 185, 129, 0.2) !important;
+}
+

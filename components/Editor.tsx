@@ -7,6 +7,7 @@ interface EditorProps {
   language: string;
   value: string;
   onChange: (value: string | undefined) => void;
+  onMount?: (editor: any, monaco: any) => void;
   settings?: {
     fontSize: number;
     theme: string;
@@ -18,6 +19,7 @@ export default function Editor({
   language, 
   value, 
   onChange, 
+  onMount,
   settings = { fontSize: 14, theme: 'vs-dark', minimap: true } 
 }: EditorProps) {
   return (
@@ -28,6 +30,7 @@ export default function Editor({
         language={language}
         value={value}
         onChange={onChange}
+        onMount={onMount}
         options={{
           fontSize: settings.fontSize,
           fontFamily: "'JetBrains Mono', monospace",

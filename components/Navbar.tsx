@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Play, Share2, Settings, Terminal, Github, User, Wand2, LogOut, FileCode, PlusCircle } from 'lucide-react';
+import { Play, Share2, Settings, Terminal, Github, User, Wand2, LogOut, FileCode, PlusCircle, Users } from 'lucide-react';
 import { SUPPORTED_LANGUAGES } from '@/lib/execution';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import styles from './Navbar.module.css';
@@ -15,6 +15,9 @@ interface NavbarProps {
   onSaveGist: () => void;
   onPushRepo: () => void;
   onOpenSettings: () => void;
+  onShareSession: () => void;
+  roomActive: boolean;
+  collaboratorsCount: number;
   isRunning: boolean;
 }
 
@@ -27,6 +30,9 @@ export default function Navbar({
   onSaveGist,
   onPushRepo,
   onOpenSettings,
+  onShareSession,
+  roomActive,
+  collaboratorsCount,
   isRunning
 }: NavbarProps) {
   const { data: session } = useSession();
@@ -64,6 +70,15 @@ export default function Navbar({
       </div>
 
       <div className={styles.actions}>
+        <button 
+          className={`${styles.iconBtn} ${roomActive ? styles.collabBtnActive : ''}`} 
+          onClick={onShareSession} 
+          title={roomActive ? "Copy Session Link" : "Start Live Collaboration"}
+        >
+          <Users size={20} />
+          {roomActive && <span style={{ marginLeft: '4px', fontSize: '0.8rem', fontWeight: 600 }}>{collaboratorsCount}</span>}
+        </button>
+
         <button className={styles.iconBtn} onClick={onShare} title="Copy Share Link">
           <Share2 size={20} />
         </button>
