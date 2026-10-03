@@ -9,6 +9,7 @@ import SettingsModal from '@/components/SettingsModal';
 import SnippetsModal from '@/components/SnippetsModal';
 import ShortcutsModal from '@/components/ShortcutsModal';
 import AIAssistantModal from '@/components/AIAssistantModal';
+import NewFileModal from '@/components/NewFileModal';
 import { executeCode, SUPPORTED_LANGUAGES, getFileExtension } from '@/lib/execution';
 import { executeJavaScriptLocally, executePythonLocally } from '@/lib/localExecution';
 
@@ -28,9 +29,9 @@ const INITIAL_CODE: Record<string, string> = {
 export default function Home() {
   const [selectedLang, setSelectedLang] = useState(SUPPORTED_LANGUAGES[0]);
   
-  // Tabs State
+  // Tabs State (initial tab matched to default C language)
   const [tabs, setTabs] = useState<TabItem[]>([
-    { id: '1', name: 'main.py', code: INITIAL_CODE['python'], langId: 'python' }
+    { id: '1', name: 'main.c', code: INITIAL_CODE['c'], langId: 'c' }
   ]);
   const [activeTabId, setActiveTabId] = useState('1');
 
@@ -55,6 +56,7 @@ export default function Home() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSnippetsOpen, setIsSnippetsOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [isNewFileModalOpen, setIsNewFileModalOpen] = useState(false);
 
   // Settings State
   const [settings, setSettings] = useState({
@@ -66,6 +68,16 @@ export default function Home() {
   // Active tab helper
   const activeTab = tabs.find(t => t.id === activeTabId) || tabs[0];
   const code = activeTab ? activeTab.code : '';
+
+  // Sync active tab language with selected language when active tab changes
+  useEffect(() => {
+    if (activeTab) {
+      const matched = SUPPORTED_LANGUAGES.find(l => l.id === activeTab.langId);
+      if (matched && matched.id !== selectedLang.id) {
+        setSelectedLang(matched);
+      }
+    }
+  }, [activeTabId, activeTab]);
 
   // Sync theme with document element attribute and localStorage
   useEffect(() => {
@@ -135,8 +147,6 @@ export default function Home() {
       } catch (e) {
         updateActiveTabCode(INITIAL_CODE[selectedLang.id]);
       }
-    } else {
-      updateActiveTabCode(INITIAL_CODE[selectedLang.id]);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -209,17 +219,44 @@ export default function Home() {
     setTabs(prev => prev.map(t => t.id === activeTabId ? { ...t, code: newCode } : t));
   };
 
-  const handleAddTab = () => {
-    const ext = getFileExtension(selectedLang.id);
+  const handleCreateNewFile = (fileName: string) => {
+    const ext = fileName.lastIndexOf('.') > 0 ? fileName.substring(fileName.lastIndexOf('.') + 1) : getFileExtension(selectedLang.id);
+    const matchedLang = SUPPORTED_LANGUAGES.find(l => l.ext.toLowerCase() === ext.toLowerCase()) || selectedLang;
+    
     const newId = Math.random().toString(36).substring(2, 9);
     const newTab: TabItem = {
       id: newId,
-      name: `file_${tabs.length + 1}.${ext}`,
-      code: INITIAL_CODE[selectedLang.id] || '',
-      langId: selectedLang.id
+      name: fileName,
+      code: INITIAL_CODE[matchedLang.id] || '',
+      langId: matchedLang.id
     };
+    
     setTabs(prev => [...prev, newTab]);
     setActiveTabId(newId);
+    setSelectedLang(matchedLang);
+    showToast(`Created new file ${fileName}!`, 'success');
+  };
+
+  const handleRenameTab = (id: string, newName: string) => {
+    const ext = newName.lastIndexOf('.') > 0 ? newName.substring(newName.lastIndexOf('.') + 1) : '';
+    let matchedLang = SUPPORTED_LANGUAGES.find(l => l.ext.toLowerCase() === ext.toLowerCase());
+
+    setTabs(prev => prev.map(t => {
+      if (t.id === id) {
+        return {
+          ...t,
+          name: newName,
+          langId: matchedLang ? matchedLang.id : t.langId
+        };
+      }
+      return t;
+    }));
+
+    if (matchedLang && id === activeTabId) {
+      setSelectedLang(matchedLang);
+    }
+
+    showToast(`Renamed file to ${newName}`, 'success');
   };
 
   const handleCloseTab = (id: string, e: React.MouseEvent) => {
@@ -240,7 +277,8 @@ export default function Home() {
     const ext = getFileExtension(id);
     setTabs(prev => prev.map(t => {
       if (t.id === activeTabId) {
-        const baseName = t.name.substring(0, t.name.lastIndexOf('.')) || t.name;
+        const lastDot = t.name.lastIndexOf('.');
+        const baseName = lastDot > 0 ? t.name.substring(0, lastDot) : t.name;
         return {
           ...t,
           langId: id,
@@ -481,8 +519,9 @@ export default function Home() {
             tabs={tabs}
             activeTabId={activeTabId}
             onSelectTab={(id) => setActiveTabId(id)}
-            onAddTab={handleAddTab}
+            onAddTab={() => setIsNewFileModalOpen(true)}
             onCloseTab={handleCloseTab}
+            onRenameTab={handleRenameTab}
           />
           <div className="editor-wrapper">
             <Editor 
@@ -528,6 +567,13 @@ export default function Home() {
       <ShortcutsModal 
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      <NewFileModal
+        isOpen={isNewFileModalOpen}
+        onClose={() => setIsNewFileModalOpen(false)}
+        defaultExtension={getFileExtension(selectedLang.id)}
+        onCreateFile={handleCreateNewFile}
       />
 
       <AIAssistantModal
