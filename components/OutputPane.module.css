@@ -201,14 +201,36 @@
 }
 
 .errorBanner {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1rem;
   background: rgba(239, 68, 68, 0.1);
   color: var(--error);
   font-size: 0.75rem;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
   border-top: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.aiFixBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.aiFixBtn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {

@@ -8,6 +8,7 @@ import OutputPane from '@/components/OutputPane';
 import SettingsModal from '@/components/SettingsModal';
 import SnippetsModal from '@/components/SnippetsModal';
 import ShortcutsModal from '@/components/ShortcutsModal';
+import AIAssistantModal from '@/components/AIAssistantModal';
 import { executeCode, SUPPORTED_LANGUAGES, getFileExtension } from '@/lib/execution';
 import { executeJavaScriptLocally, executePythonLocally } from '@/lib/localExecution';
 
@@ -41,6 +42,14 @@ export default function Home() {
   const [compilerInfo, setCompilerInfo] = useState<string | undefined>(undefined);
   const [isRunning, setIsRunning] = useState(false);
   const [isError, setIsError] = useState(false);
+
+  // AI Assistant State
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiExplanation, setAiExplanation] = useState<string | undefined>(undefined);
+  const [aiComplexity, setAiComplexity] = useState<string | undefined>(undefined);
+  const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
+  const [aiFixedCode, setAiFixedCode] = useState<string | undefined>(undefined);
 
   // Modals State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -338,6 +347,74 @@ export default function Home() {
     showToast(`Template loaded into editor!`, 'success');
   };
 
+  // AI Handlers
+  const handleAiFix = async () => {
+    setIsAiLoading(true);
+    setIsAiModalOpen(true);
+    setAiExplanation(undefined);
+    setAiComplexity(undefined);
+    setAiSuggestions([]);
+    setAiFixedCode(undefined);
+
+    try {
+      const res = await fetch('/api/ai/fix', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code,
+          language: selectedLang.name,
+          error: stderr || output || 'Execution failed',
+        }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setAiFixedCode(data.fixedCode);
+      setAiExplanation(data.explanation);
+      showToast('AI analysis complete!', 'success');
+    } catch (err: any) {
+      setAiExplanation(`Failed to run AI Auto-Fix: ${err.message}`);
+      showToast('AI Auto-Fix failed.', 'error');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const handleAiExplain = async () => {
+    setIsAiLoading(true);
+    setIsAiModalOpen(true);
+    setAiExplanation(undefined);
+    setAiComplexity(undefined);
+    setAiSuggestions([]);
+    setAiFixedCode(undefined);
+
+    try {
+      const res = await fetch('/api/ai/explain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code,
+          language: selectedLang.name,
+        }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setAiExplanation(data.explanation);
+      setAiComplexity(data.complexity);
+      setAiSuggestions(data.suggestions || []);
+      showToast('AI code analysis complete!', 'success');
+    } catch (err: any) {
+      setAiExplanation(`Failed to analyze code with AI: ${err.message}`);
+      showToast('AI Analysis failed.', 'error');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const handleApplyAiFix = (newFixedCode: string) => {
+    updateActiveTabCode(newFixedCode);
+    showToast('Applied AI fix code to editor!', 'success');
+  };
+
   // Global Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -384,6 +461,7 @@ export default function Home() {
         onShare={handleShare}
         onFormat={handleFormat}
         onOpenSnippets={() => setIsSnippetsOpen(true)}
+        onOpenAiAssistant={handleAiExplain}
         onDownload={handleDownload}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
         onSaveGist={() => showToast('Saved as GitHub Gist!', 'success')}
@@ -427,6 +505,8 @@ export default function Home() {
             stdin={stdin}
             onStdinChange={(val) => setStdin(val)}
             onClear={() => { setOutput(''); setStderr(''); setIsError(false); setTimeMs(undefined); }} 
+            onAiFix={handleAiFix}
+            isAiLoading={isAiLoading}
           />
         </div>
       </main>
@@ -448,6 +528,17 @@ export default function Home() {
       <ShortcutsModal 
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      <AIAssistantModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        loading={isAiLoading}
+        explanation={aiExplanation}
+        complexity={aiComplexity}
+        suggestions={aiSuggestions}
+        fixedCode={aiFixedCode}
+        onApplyFix={handleApplyAiFix}
       />
 
       {/* Toast Notification Container */}

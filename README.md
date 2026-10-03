@@ -1,52 +1,62 @@
-# 🚀 UniCompile - Universal Online Compiler (v0.2.0)
+# 🚀 UniCompile - Universal Online Compiler (v0.3.0)
 
-UniCompile is a premium, high-performance, and responsive multi-language online compiler & IDE. Built with **Next.js 16**, **Monaco Editor**, and **WebAssembly**, it provides a professional-grade development environment that works both online and offline across Windows, macOS, iOS (iPhone/iPad), and Android devices.
+UniCompile is a premium, high-performance, and responsive multi-language online compiler & AI IDE. Built with **Next.js 16**, **Azure OpenAI (GPT-4o)**, **Monaco Editor**, and **WebAssembly**, it provides a professional-grade development environment that works both online and offline across Windows, macOS, iOS (iPhone/iPad), and Android devices.
 
 ---
 
-## ✨ Key Features (v0.2.0 Update)
+## 🤖 Azure AI Integration (v0.3.0)
 
--   **🌐 Multi-Language Support**: Compile and run code in C, C++, Python, Java, C#, Go, Rust, PHP, JavaScript, and TypeScript.
--   **🌓 Seamless Dark & Light Themes**:
-    -   Quick-toggle theme button with smooth transitions.
-    -   Supports **Pro Dark**, **Light Mode**, and **High Contrast Black** with Monaco editor synchronization.
--   **📥 Interactive STDIN & Execution Stats**:
-    -   Provide standard input stream data directly into programs via the **STDIN Input** tab.
-    -   Real-time **Execution Stats** showing runtime duration in milliseconds, memory details, and exit codes (`Exit 0` / `Exit 1`).
--   **📚 Code Templates & Algorithm Library**:
-    -   Curated catalog of starters, competitive programming templates, data structures (BST, Graphs, Knapsack DP), and sorting algorithms.
--   **📑 Multi-File Editor Tabs**:
-    -   Manage multiple file drafts simultaneously with tabbed navigation (`main.py`, `helper.cpp`, `test.js`).
--   **💾 Code Export & File Downloader**:
-    -   One-click file downloader saving your code with proper extensions (`.py`, `.cpp`, `.cs`, `.java`, `.rs`, `.go`, `.php`, etc.).
--   **⌨️ Global Keyboard Shortcuts**:
-    -   <kbd>⌘/Ctrl</kbd> + <kbd>Enter</kbd>: Compile & Run Code
-    -   <kbd>⌘/Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd>: Format Code
-    -   <kbd>⌘/Ctrl</kbd> + <kbd>S</kbd>: Download File
-    -   <kbd>⌘/Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>: Templates Library
-    -   <kbd>⌘/Ctrl</kbd> + <kbd>/</kbd>: Shortcuts Help Sheet
--   **📶 Offline-First & Auto-Cache Update**:
-    -   **PWA** with immediate Service Worker activation (`skipWaiting: true`) and cache-invalidation headers ensuring instant updates across all Windows, iOS (iPhone), and MacBook devices.
-    -   **Local Execution**: Uses **WebAssembly (Pyodide)** to run Python and JavaScript locally in the browser when offline.
--   **👥 Real-Time WebRTC Collaboration**:
-    -   Live multi-user peer-to-peer coding sessions using Yjs and WebRTC.
--   **🐙 GitHub Integration**:
-    -   Sign in with GitHub (NextAuth OAuth), Save to Gist, and Snapshot URL Sharing.
+UniCompile is backed by dedicated Azure OpenAI resources deployed under Azure Subscription `6556862d-2bee-43e2-bd37-4493ea5c1c70`:
+
+- **Resource Group**: `rg-unicompile-ai`
+- **Azure OpenAI Service**: `oai-unicompile-sweden` (`swedencentral`)
+- **Deployed Model**: `gpt-4o` (`GlobalStandard` SKU)
+- **Endpoint**: `https://oai-unicompile-sweden.openai.azure.com/`
+
+### AI Capabilities
+1. **✨ 1-Click Auto-Fix & Explain**:
+   - Automatically detects compiler or runtime errors.
+   - Click **"✨ Auto-Fix & Explain with AI"** to receive fixed code and a step-by-step diagnostic breakdown.
+   - Click **"Apply Fix to Editor"** to immediately update your code in Monaco Editor.
+2. **🧠 Code Complexity & AI Assistant**:
+   - Analyze time and space complexity (e.g., $O(N \log N)$ Time, $O(1)$ Space).
+   - Get automated code refactoring and security suggestions.
+3. **⚡ AI Inline Completion Engine**:
+   - Real-time inline code completion via `/api/ai/complete`.
+
+---
+
+## ✨ Core Key Features
+
+- **🌐 Multi-Language Support**: C, C++, Python, Java, C#, Go, Rust, PHP, JavaScript, and TypeScript.
+- **🌓 Dark, Light & High Contrast Themes**: Seamless theme toggle with Monaco editor synchronization.
+- **📥 Interactive STDIN & Execution Stats**: Custom STDIN input stream, execution duration (ms), memory, and exit code badges.
+- **📚 Code Templates & Algorithm Library**: Pre-loaded algorithm and starter snippets.
+- **📑 Multi-File Editor Tabs**: Manage multiple file drafts simultaneously.
+- **💾 Code Export & File Downloader**: Download source files with proper extensions (`.py`, `.cpp`, `.cs`, `.java`, etc.).
+- **⌨️ Global Keyboard Shortcuts**:
+  - <kbd>⌘/Ctrl</kbd> + <kbd>Enter</kbd>: Compile & Run Code
+  - <kbd>⌘/Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd>: Format Code
+  - <kbd>⌘/Ctrl</kbd> + <kbd>S</kbd>: Download File
+  - <kbd>⌘/Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>: Templates Library
+  - <kbd>⌘/Ctrl</kbd> + <kbd>/</kbd>: Shortcuts Help Sheet
+- **📶 Offline-First & Auto-Cache Update**:
+  - **PWA** with immediate Service Worker activation (`skipWaiting: true`) and cache-invalidation headers for instant updates across Windows, iOS, and Mac.
+  - **WebAssembly (Pyodide)** for offline Python & JavaScript execution.
+- **👥 Real-Time WebRTC Collaboration**: Live multi-user peer-to-peer coding sessions using Yjs and WebRTC.
 
 ---
 
 ## 🛠️ Technology Stack
 
-UniCompile is built on a modern, high-performance web development stack:
-
 | Technology | Badge & Version | Purpose |
 | :--- | :--- | :--- |
+| **Azure OpenAI** | [![Azure OpenAI](https://img.shields.io/badge/Azure_OpenAI-GPT--4o-0078D4?style=flat-square&logo=microsoftazure&logoColor=white)](https://azure.microsoft.com/en-us/products/ai-services/openai-service) | AI Auto-Fix, Code Analysis & Completion |
 | **Next.js** | [![Next.js](https://img.shields.io/badge/Next.js-16.2.4-000000?style=flat-square&logo=nextdotjs&logoColor=white)](https://nextjs.org/) | React Framework (App Router) |
 | **React** | [![React](https://img.shields.io/badge/React-19.2.4-20232a?style=flat-square&logo=react&logoColor=61dafb)](https://react.dev/) | UI library (React 19) |
 | **TypeScript** | [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) | Strict static typing and code reliability |
 | **Monaco Editor** | [![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-4.7.0-007acc?style=flat-square&logo=visual-studio-code&logoColor=white)](https://github.com/suren-atoyan/monaco-react) | In-browser code editor |
 | **Yjs & WebRTC** | [![Yjs](https://img.shields.io/badge/Yjs-13.6.31-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://yjs.dev/) | Real-time CRDT collaboration |
-| **NextAuth.js** | [![NextAuth.js](https://img.shields.io/badge/NextAuth.js-4.24.14-111?style=flat-square&logo=nextdotjs&logoColor=white)](https://next-auth.js.org/) | User authentication (GitHub OAuth) |
 | **Lucide React** | [![Lucide React](https://img.shields.io/badge/Lucide_React-0.454.0-ff79c6?style=flat-square&logo=lucide&logoColor=white)](https://lucide.dev/) | Iconography system |
 
 ---
@@ -57,50 +67,51 @@ UniCompile is built on a modern, high-performance web development stack:
 UniCompile/
 ├── app/
 │   ├── api/
-│   │   ├── auth/[...nextauth]/route.ts     # GitHub OAuth NextAuth handlers
-│   │   └── github/gist/route.ts            # GitHub Gist export API endpoint
-│   ├── favicon.ico                         # Application icon
-│   ├── globals.css                         # Dark, Light, & High Contrast design tokens
-│   ├── layout.tsx                          # HTML frame, PWA cache invalidation headers
-│   └── page.tsx                            # Primary application page & router state
+│   │   ├── ai/
+│   │   │   ├── complete/route.ts          # AI inline completion endpoint
+│   │   │   ├── explain/route.ts           # AI code analysis & complexity endpoint
+│   │   │   └── fix/route.ts               # AI auto-fix & error diagnostic endpoint
+│   │   ├── auth/[...nextauth]/route.ts    # GitHub OAuth NextAuth handlers
+│   │   └── github/gist/route.ts           # GitHub Gist export API endpoint
+│   ├── favicon.ico                        # Application icon
+│   ├── globals.css                        # Dark, Light, & High Contrast design tokens
+│   ├── layout.tsx                         # HTML frame, PWA cache invalidation headers
+│   └── page.tsx                           # Primary application page & router state
 ├── components/
-│   ├── Editor.tsx                          # Monaco Editor wrapper component
-│   ├── EditorTabs.tsx                      # Multi-file tab navigation bar
-│   ├── EditorTabs.module.css               # Multi-file tab styles
-│   ├── Navbar.tsx                          # Top header with Run, Templates, Download, Theme, Collab
-│   ├── OutputPane.tsx                      # Terminal output, STDIN input, & Execution stats
-│   ├── OutputPane.module.css               # Terminal & STDIN layout styling
-│   ├── ShortcutsModal.tsx                  # Keyboard shortcuts cheat sheet modal
-│   ├── SnippetsModal.tsx                   # Templates & algorithm library drawer
-│   └── SettingsModal.tsx                   # Editor custom settings panel
+│   ├── AIAssistantModal.tsx               # Azure AI assistant & code auto-fix dialog
+│   ├── AIAssistantModal.module.css        # AIAssistantModal styles
+│   ├── Editor.tsx                         # Monaco Editor wrapper component
+│   ├── EditorTabs.tsx                     # Multi-file tab navigation bar
+│   ├── Navbar.tsx                         # Header with Run, Ask AI, Templates, Download, Theme
+│   ├── OutputPane.tsx                     # Terminal output, STDIN input, & AI Auto-Fix button
+│   ├── ShortcutsModal.tsx                 # Keyboard shortcuts cheat sheet modal
+│   ├── SnippetsModal.tsx                  # Templates & algorithm library drawer
+│   └── SettingsModal.tsx                  # Editor custom settings panel
 ├── lib/
-│   ├── execution.ts                        # Wandbox API execution engine & stdin support
-│   ├── localExecution.ts                   # Pyodide (WASM) & JS offline runner
-│   └── snippets.ts                         # Pre-loaded algorithm and starter snippets
+│   ├── ai.ts                              # Azure OpenAI API client helper
+│   ├── execution.ts                       # Wandbox API execution engine
+│   ├── localExecution.ts                  # Pyodide (WASM) & JS offline runner
+│   └── snippets.ts                        # Pre-loaded algorithm and starter snippets
 ├── public/
-│   ├── logo.svg                            # Application vector logo
-│   ├── manifest.json                       # PWA manifest
-│   └── sw.js                               # Service Worker with immediate cache activation
-├── next.config.ts                          # Next-PWA setup with skipWaiting: true
-└── package.json                            # v0.2.0 application manifest
+│   ├── manifest.json                      # PWA manifest
+│   └── sw.js                              # Service Worker with immediate cache activation
+├── next.config.ts                         # Next-PWA setup with skipWaiting: true
+└── package.json                           # v0.3.0 application manifest
 ```
 
 ---
 
 ## 🔄 Flow Diagrams
 
-### Code Execution & STDIN Flow
+### Azure AI Error Fix & Code Assistant Flow
 ```mermaid
 graph TD
-    A["User types Code & STDIN Input"] --> B{"Is language offline supported?"}
-    B -->|"Yes (JS / TS / Python)"| C{"Is device offline?"}
-    C -->|"Yes"| D["Execute inside browser sandbox via WASM"]
-    C -->|"No"| D
-    B -->|"No (C, C++, Rust, Go, etc.)"| E{"Is device online?"}
-    E -->|"Yes"| F["Send Code + STDIN payload to Wandbox API"]
-    E -->|"No"| G["Display offline warning toast notification"]
-    D --> H["Display stdout/stderr & Execution Stats in OutputPane"]
-    F --> H
+    A["Compiler Error / User clicks Ask AI"] --> B["Send Code + Error Context to /api/ai/fix"]
+    B --> C["Call Azure OpenAI GPT-4o Service (oai-unicompile-sweden)"]
+    C --> D["Return JSON with fixedCode & Markdown explanation"]
+    D --> E["Render AIAssistantModal & OutputPane Auto-Fix Banner"]
+    E --> F["User clicks Apply Fix to Editor"]
+    F --> G["Replace broken code in Monaco Editor"]
 ```
 
 ---

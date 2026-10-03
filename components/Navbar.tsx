@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Play, Share2, Settings, Terminal, Github, User, Wand2, LogOut, FileCode, PlusCircle, Users, Sun, Moon, BookOpen, Download, Keyboard } from 'lucide-react';
+import { Play, Share2, Settings, Terminal, Github, User, Wand2, LogOut, FileCode, PlusCircle, Users, Sun, Moon, BookOpen, Download, Keyboard, Sparkles } from 'lucide-react';
 import { SUPPORTED_LANGUAGES } from '@/lib/execution';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import styles from './Navbar.module.css';
@@ -13,6 +13,7 @@ interface NavbarProps {
   onShare: () => void;
   onFormat: () => void;
   onOpenSnippets: () => void;
+  onOpenAiAssistant: () => void;
   onDownload: () => void;
   onOpenShortcuts: () => void;
   onSaveGist: () => void;
@@ -33,6 +34,7 @@ export default function Navbar({
   onShare,
   onFormat,
   onOpenSnippets,
+  onOpenAiAssistant,
   onDownload,
   onOpenShortcuts,
   onSaveGist,
@@ -72,6 +74,11 @@ export default function Navbar({
         <button className="btn btn-secondary" onClick={onOpenSnippets} title="Templates & Algorithm Library">
           <BookOpen size={18} />
           <span>Templates</span>
+        </button>
+
+        <button className="btn btn-secondary" onClick={onOpenAiAssistant} title="Azure AI Assistant & Code Analysis">
+          <Sparkles size={18} style={{ color: 'var(--accent)' }} />
+          <span>Ask AI</span>
         </button>
 
         <button className="btn btn-secondary" onClick={onFormat} title="Format Code">

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Trash2, AlertCircle, Sliders, Activity, Zap, CheckCircle2, XCircle } from 'lucide-react';
+import { Terminal, Trash2, AlertCircle, Sliders, Activity, Zap, CheckCircle2, XCircle, Sparkles } from 'lucide-react';
 import styles from './OutputPane.module.css';
 
 interface OutputPaneProps {
@@ -13,6 +13,8 @@ interface OutputPaneProps {
   stdin: string;
   onStdinChange: (val: string) => void;
   onClear: () => void;
+  onAiFix?: () => void;
+  isAiLoading?: boolean;
 }
 
 export default function OutputPane({
@@ -24,6 +26,8 @@ export default function OutputPane({
   stdin,
   onStdinChange,
   onClear,
+  onAiFix,
+  isAiLoading,
 }: OutputPaneProps) {
   const [activeTab, setActiveTab] = useState<'output' | 'stdin' | 'stats'>('output');
 
@@ -141,8 +145,16 @@ export default function OutputPane({
 
       {isError && activeTab === 'output' && (
         <div className={styles.errorBanner}>
-          <AlertCircle size={14} />
-          <span>Execution finished with errors.</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <AlertCircle size={14} />
+            <span>Execution finished with errors.</span>
+          </div>
+          {onAiFix && (
+            <button className={styles.aiFixBtn} onClick={onAiFix} disabled={isAiLoading}>
+              <Sparkles size={14} />
+              <span>{isAiLoading ? 'AI Analyzing...' : '✨ Auto-Fix & Explain with AI'}</span>
+            </button>
+          )}
         </div>
       )}
     </div>
