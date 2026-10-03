@@ -233,6 +233,106 @@
   transform: translateY(-1px);
 }
 
+.stdinBanner {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.stdinBannerHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #f59e0b;
+}
+
+.stdinBannerText {
+  font-size: 0.8rem;
+  color: var(--foreground);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.stdinBannerText code {
+  background: var(--surface-border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+}
+
+.stdinQuickBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.2rem;
+}
+
+.stdinQuickTextarea {
+  width: 100%;
+  background: var(--console-bg);
+  border: 1px solid var(--surface-border);
+  color: var(--console-text);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.stdinQuickTextarea:focus {
+  border-color: var(--accent);
+}
+
+.stdinRunBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--accent), #4f46e5);
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  align-self: flex-start;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.stdinRunBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.tabPulseBadge {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
 @media (max-width: 768px) {
   .container {
     border-left: none;
@@ -240,3 +340,4 @@
     height: 40%;
   }
 }
+

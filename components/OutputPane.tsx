@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Trash2, AlertCircle, Sliders, Activity, Zap, CheckCircle2, XCircle, Sparkles } from 'lucide-react';
+import { Terminal, Trash2, AlertCircle, Sliders, Activity, Zap, CheckCircle2, XCircle, Sparkles, HelpCircle } from 'lucide-react';
 import styles from './OutputPane.module.css';
 
 interface OutputPaneProps {
@@ -13,9 +13,24 @@ interface OutputPaneProps {
   stdin: string;
   onStdinChange: (val: string) => void;
   onClear: () => void;
+  onRun?: () => void;
   onAiFix?: () => void;
   isAiLoading?: boolean;
 }
+
+const isPromptDetected = (text: string) => {
+  if (!text) return false;
+  const lower = text.toLowerCase();
+  return (
+    lower.includes(':') ||
+    lower.includes('?') ||
+    lower.includes('enter') ||
+    lower.includes('input') ||
+    lower.includes('how many') ||
+    lower.includes('number of') ||
+    lower.includes('set of numbers')
+  );
+};
 
 export default function OutputPane({
   output,
@@ -26,12 +41,14 @@ export default function OutputPane({
   stdin,
   onStdinChange,
   onClear,
+  onRun,
   onAiFix,
   isAiLoading,
 }: OutputPaneProps) {
   const [activeTab, setActiveTab] = useState<'output' | 'stdin' | 'stats'>('output');
 
   const hasExecuted = output !== '' || stderr !== '';
+  const promptFound = hasExecuted && isPromptDetected(output);
 
   return (
     <div className={styles.container}>
@@ -50,7 +67,11 @@ export default function OutputPane({
           >
             <Sliders size={14} />
             <span>STDIN Input</span>
-            {stdin.trim() && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)' }}></span>}
+            {stdin.trim() ? (
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)' }}></span>
+            ) : promptFound ? (
+              <span className={styles.tabPulseBadge} title="Input Expected!"></span>
+            ) : null}
           </button>
           <button
             className={`${styles.tabBtn} ${activeTab === 'stats' ? styles.active : ''}`}
@@ -91,10 +112,39 @@ export default function OutputPane({
                 <span>Click "Run Code" or press <kbd style={{ background: 'var(--surface)', padding: '2px 6px', borderRadius: 4, border: '1px solid var(--surface-border)' }}>⌘+Enter</kbd> to compile & execute.</span>
               </div>
             ) : (
-              <pre className={isError ? styles.error : styles.stdout}>
-                {output}
-                {stderr && <div className={styles.stderr}>{stderr}</div>}
-              </pre>
+              <div>
+                <pre className={isError ? styles.error : styles.stdout}>
+                  {output}
+                  {stderr && <div className={styles.stderr}>{stderr}</div>}
+                </pre>
+
+                {promptFound && (
+                  <div className={styles.stdinBanner}>
+                    <div className={styles.stdinBannerHeader}>
+                      <HelpCircle size={16} />
+                      <span>Input Values Required (STDIN)</span>
+                    </div>
+                    <p className={styles.stdinBannerText}>
+                      Your program asked for input (e.g. <code>scanf</code> / <code>input()</code>). Since execution runs in a non-interactive server environment, enter all input values below (each prompt on a new line or separated by spaces) and click <strong>Run Code with Input</strong>:
+                    </p>
+                    <div className={styles.stdinQuickBox}>
+                      <textarea
+                        className={styles.stdinQuickTextarea}
+                        rows={3}
+                        value={stdin}
+                        onChange={(e) => onStdinChange(e.target.value)}
+                        placeholder={`Example input values:\n5\n10 20 30 40 50`}
+                      />
+                      {onRun && (
+                        <button className={styles.stdinRunBtn} onClick={onRun}>
+                          <Zap size={14} />
+                          <span>Run Code with STDIN Input</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </>
         )}
@@ -108,8 +158,16 @@ export default function OutputPane({
               className={styles.stdinTextarea}
               value={stdin}
               onChange={(e) => onStdinChange(e.target.value)}
-              placeholder="Type your input values here (e.g. numbers, strings, multiline inputs)..."
+              placeholder={`Type your input values here (e.g. numbers or text for scanf / input):\n\nExample:\n5\n10 20 30 40 50`}
             />
+            {onRun && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.4rem' }}>
+                <button className={styles.stdinRunBtn} onClick={onRun}>
+                  <Zap size={14} />
+                  <span>Run Code with STDIN Input</span>
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -160,3 +218,4 @@ export default function OutputPane({
     </div>
   );
 }
+

@@ -553,6 +553,7 @@ export default function Home() {
             stdin={stdin}
             onStdinChange={(val) => setStdin(val)}
             onClear={() => { setOutput(''); setStderr(''); setIsError(false); setTimeMs(undefined); }} 
+            onRun={handleRun}
             onAiFix={handleAiFix}
             isAiLoading={isAiLoading}
           />
