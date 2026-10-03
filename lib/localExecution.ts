@@ -4,6 +4,7 @@ export interface LocalExecuteResult {
   stdout: string;
   stderr: string;
   code: number;
+  timeMs?: number;
 }
 
 let pyodide: any = null;
@@ -23,6 +24,7 @@ async function loadPyodide() {
 }
 
 export async function executeJavaScriptLocally(code: string): Promise<LocalExecuteResult> {
+  const startTime = performance.now();
   let output = '';
   const originalLog = console.log;
   const originalError = console.error;
@@ -37,9 +39,11 @@ export async function executeJavaScriptLocally(code: string): Promise<LocalExecu
   try {
     // eslint-disable-next-line no-eval
     eval(code);
-    return { stdout: output, stderr: '', code: 0 };
+    const duration = Math.round(performance.now() - startTime);
+    return { stdout: output, stderr: '', code: 0, timeMs: duration };
   } catch (err: any) {
-    return { stdout: output, stderr: err.message, code: 1 };
+    const duration = Math.round(performance.now() - startTime);
+    return { stdout: output, stderr: err.message, code: 1, timeMs: duration };
   } finally {
     console.log = originalLog;
     console.error = originalError;
@@ -47,6 +51,7 @@ export async function executeJavaScriptLocally(code: string): Promise<LocalExecu
 }
 
 export async function executePythonLocally(code: string): Promise<LocalExecuteResult> {
+  const startTime = performance.now();
   try {
     const py = await loadPyodide();
     let output = '';
@@ -59,8 +64,10 @@ export async function executePythonLocally(code: string): Promise<LocalExecuteRe
     });
 
     await py.runPythonAsync(code);
-    return { stdout: output, stderr: '', code: 0 };
+    const duration = Math.round(performance.now() - startTime);
+    return { stdout: output, stderr: '', code: 0, timeMs: duration };
   } catch (err: any) {
-    return { stdout: '', stderr: err.message, code: 1 };
+    const duration = Math.round(performance.now() - startTime);
+    return { stdout: '', stderr: err.message, code: 1, timeMs: duration };
   }
 }

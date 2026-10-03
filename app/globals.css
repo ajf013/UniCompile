@@ -1,19 +1,71 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-:root {
+:root,
+[data-theme="dark"],
+[data-theme="vs-dark"] {
   --background: #0a0a0c;
   --foreground: #f8fafc;
   --accent: #6366f1;
   --accent-hover: #4f46e5;
-  --surface: rgba(255, 255, 255, 0.03);
+  --surface: rgba(255, 255, 255, 0.04);
   --surface-border: rgba(255, 255, 255, 0.1);
-  --surface-hover: rgba(255, 255, 255, 0.06);
+  --surface-hover: rgba(255, 255, 255, 0.08);
   --text-muted: #94a3b8;
-  --glass-bg: rgba(15, 15, 20, 0.7);
+  --glass-bg: rgba(15, 15, 20, 0.75);
   --glass-border: rgba(255, 255, 255, 0.08);
+  --console-bg: #0d0e12;
+  --console-text: #f8fafc;
+  --logo-gradient: linear-gradient(to right, #ffffff, #94a3b8);
+  --toast-bg: rgba(18, 18, 22, 0.9);
+  --toast-color: #ffffff;
+  --dropdown-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
   --success: #10b981;
   --error: #ef4444;
   --warning: #f59e0b;
+}
+
+[data-theme="light"] {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --surface: rgba(0, 0, 0, 0.04);
+  --surface-border: rgba(0, 0, 0, 0.12);
+  --surface-hover: rgba(0, 0, 0, 0.08);
+  --text-muted: #64748b;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --console-bg: #f1f5f9;
+  --console-text: #0f172a;
+  --logo-gradient: linear-gradient(to right, #0f172a, #475569);
+  --toast-bg: rgba(255, 255, 255, 0.95);
+  --toast-color: #0f172a;
+  --dropdown-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
+  --success: #059669;
+  --error: #dc2626;
+  --warning: #d97706;
+}
+
+[data-theme="hc-black"] {
+  --background: #000000;
+  --foreground: #ffffff;
+  --accent: #818cf8;
+  --accent-hover: #6366f1;
+  --surface: rgba(255, 255, 255, 0.08);
+  --surface-border: #333333;
+  --surface-hover: rgba(255, 255, 255, 0.15);
+  --text-muted: #a1a1aa;
+  --glass-bg: #000000;
+  --glass-border: #444444;
+  --console-bg: #000000;
+  --console-text: #ffffff;
+  --logo-gradient: linear-gradient(to right, #ffffff, #e4e4e7);
+  --toast-bg: #111111;
+  --toast-color: #ffffff;
+  --dropdown-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.9);
+  --success: #34d399;
+  --error: #f87171;
+  --warning: #fbbf24;
 }
 
 * {
@@ -29,6 +81,7 @@ html, body {
   color: var(--foreground);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
   /* iOS Safe Areas */
   padding-bottom: env(safe-area-inset-bottom);
 }

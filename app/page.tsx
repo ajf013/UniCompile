@@ -3,9 +3,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '@/components/Navbar';
 import Editor from '@/components/Editor';
+import EditorTabs, { TabItem } from '@/components/EditorTabs';
 import OutputPane from '@/components/OutputPane';
 import SettingsModal from '@/components/SettingsModal';
-import { executeCode, SUPPORTED_LANGUAGES } from '@/lib/execution';
+import SnippetsModal from '@/components/SnippetsModal';
+import ShortcutsModal from '@/components/ShortcutsModal';
+import { executeCode, SUPPORTED_LANGUAGES, getFileExtension } from '@/lib/execution';
 import { executeJavaScriptLocally, executePythonLocally } from '@/lib/localExecution';
 
 const INITIAL_CODE: Record<string, string> = {
@@ -23,19 +26,63 @@ const INITIAL_CODE: Record<string, string> = {
 
 export default function Home() {
   const [selectedLang, setSelectedLang] = useState(SUPPORTED_LANGUAGES[0]);
-  const [code, setCode] = useState('');
+  
+  // Tabs State
+  const [tabs, setTabs] = useState<TabItem[]>([
+    { id: '1', name: 'main.py', code: INITIAL_CODE['python'], langId: 'python' }
+  ]);
+  const [activeTabId, setActiveTabId] = useState('1');
+
+  // Output & Execution State
   const [output, setOutput] = useState('');
   const [stderr, setStderr] = useState('');
+  const [stdin, setStdin] = useState('');
+  const [timeMs, setTimeMs] = useState<number | undefined>(undefined);
+  const [compilerInfo, setCompilerInfo] = useState<string | undefined>(undefined);
   const [isRunning, setIsRunning] = useState(false);
   const [isError, setIsError] = useState(false);
-  
-  // Settings State
+
+  // Modals State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSnippetsOpen, setIsSnippetsOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+
+  // Settings State
   const [settings, setSettings] = useState({
     fontSize: 14,
     theme: 'vs-dark',
     minimap: true
   });
+
+  // Active tab helper
+  const activeTab = tabs.find(t => t.id === activeTabId) || tabs[0];
+  const code = activeTab ? activeTab.code : '';
+
+  // Sync theme with document element attribute and localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('unicompile_settings');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setSettings(prev => ({ ...prev, ...parsed }));
+      }
+    } catch (e) {}
+  }, []);
+
+  useEffect(() => {
+    const themeAttr = settings.theme === 'light' ? 'light' : (settings.theme === 'hc-black' ? 'hc-black' : 'dark');
+    document.documentElement.setAttribute('data-theme', themeAttr);
+    try {
+      localStorage.setItem('unicompile_settings', JSON.stringify(settings));
+    } catch (e) {}
+  }, [settings]);
+
+  const handleToggleTheme = () => {
+    setSettings(prev => ({
+      ...prev,
+      theme: prev.theme === 'light' ? 'vs-dark' : 'light'
+    }));
+  };
 
   // Collaboration State
   const [roomName, setRoomName] = useState<string | null>(null);
@@ -69,16 +116,18 @@ export default function Home() {
       try {
         const decoded = atob(hash);
         const data = JSON.parse(decoded);
-        if (data.code) setCode(data.code);
+        if (data.code && activeTabId) {
+          updateActiveTabCode(data.code);
+        }
         if (data.lang) {
           const lang = SUPPORTED_LANGUAGES.find(l => l.id === data.lang);
           if (lang) setSelectedLang(lang);
         }
       } catch (e) {
-        setCode(INITIAL_CODE[selectedLang.id]);
+        updateActiveTabCode(INITIAL_CODE[selectedLang.id]);
       }
     } else {
-      setCode(INITIAL_CODE[selectedLang.id]);
+      updateActiveTabCode(INITIAL_CODE[selectedLang.id]);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -146,13 +195,52 @@ export default function Home() {
     };
   }, [roomName, editorInstance]);
 
+  // Tab management helpers
+  const updateActiveTabCode = (newCode: string) => {
+    setTabs(prev => prev.map(t => t.id === activeTabId ? { ...t, code: newCode } : t));
+  };
+
+  const handleAddTab = () => {
+    const ext = getFileExtension(selectedLang.id);
+    const newId = Math.random().toString(36).substring(2, 9);
+    const newTab: TabItem = {
+      id: newId,
+      name: `file_${tabs.length + 1}.${ext}`,
+      code: INITIAL_CODE[selectedLang.id] || '',
+      langId: selectedLang.id
+    };
+    setTabs(prev => [...prev, newTab]);
+    setActiveTabId(newId);
+  };
+
+  const handleCloseTab = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (tabs.length <= 1) return;
+    const nextTabs = tabs.filter(t => t.id !== id);
+    setTabs(nextTabs);
+    if (activeTabId === id) {
+      setActiveTabId(nextTabs[nextTabs.length - 1].id);
+    }
+  };
+
   const handleLanguageChange = (id: string) => {
     const lang = SUPPORTED_LANGUAGES.find(l => l.id === id);
     if (lang) setSelectedLang(lang);
     
-    if (!roomActive) {
-      setCode(INITIAL_CODE[id] || '');
-    }
+    // Update active tab extension and language
+    const ext = getFileExtension(id);
+    setTabs(prev => prev.map(t => {
+      if (t.id === activeTabId) {
+        const baseName = t.name.substring(0, t.name.lastIndexOf('.')) || t.name;
+        return {
+          ...t,
+          langId: id,
+          name: `${baseName}.${ext}`,
+          code: !roomActive ? (INITIAL_CODE[id] || '') : t.code
+        };
+      }
+      return t;
+    }));
 
     if (roomActive && ydocRef.current) {
       const ymeta = ydocRef.current.getMap('meta');
@@ -165,6 +253,8 @@ export default function Home() {
     setIsError(false);
     setOutput('');
     setStderr('');
+    setTimeMs(undefined);
+    setCompilerInfo(undefined);
 
     try {
       const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
@@ -179,15 +269,19 @@ export default function Home() {
           setOutput(result.stdout);
           setStderr(result.stderr);
           setIsError(result.code !== 0);
+          setTimeMs(result.timeMs);
+          setCompilerInfo(`${selectedLang.name} Client Runtime`);
           setIsRunning(false);
           return;
         }
       }
       if (isOffline) throw new Error('You are offline and this language requires internet.');
-      const result = await executeCode(selectedLang.compiler, code);
+      const result = await executeCode(selectedLang.compiler, code, stdin);
       setOutput(result.run.output);
       setStderr(result.run.stderr);
       setIsError(result.run.code !== 0);
+      setTimeMs(result.run.timeMs);
+      setCompilerInfo(result.run.compilerInfo || selectedLang.compiler);
     } catch (error: any) {
       setIsError(true);
       setOutput(error.message || 'Failed to execute code.');
@@ -197,8 +291,21 @@ export default function Home() {
   };
 
   const handleFormat = () => {
-    setCode(code.trim());
+    updateActiveTabCode(code.trim());
     showToast('Code formatted successfully!', 'success');
+  };
+
+  const handleDownload = () => {
+    const ext = getFileExtension(selectedLang.id);
+    const fileName = activeTab ? activeTab.name : `code.${ext}`;
+    const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast(`Downloaded ${fileName}!`, 'success');
   };
 
   const handleShare = () => {
@@ -225,6 +332,49 @@ export default function Home() {
     showToast('Live collaboration session started! Link copied.', 'success');
   };
 
+  const handleSelectSnippet = (snippetCode: string, snippetLangId: string) => {
+    handleLanguageChange(snippetLangId);
+    updateActiveTabCode(snippetCode);
+    showToast(`Template loaded into editor!`, 'success');
+  };
+
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+      
+      // Cmd/Ctrl + Enter -> Run Code
+      if (isCmdOrCtrl && e.key === 'Enter') {
+        e.preventDefault();
+        handleRun();
+      }
+      // Cmd/Ctrl + Shift + F -> Format
+      else if (isCmdOrCtrl && e.shiftKey && (e.key === 'F' || e.key === 'f')) {
+        e.preventDefault();
+        handleFormat();
+      }
+      // Cmd/Ctrl + S -> Download File
+      else if (isCmdOrCtrl && (e.key === 'S' || e.key === 's')) {
+        e.preventDefault();
+        handleDownload();
+      }
+      // Cmd/Ctrl + Shift + L -> Snippets Library
+      else if (isCmdOrCtrl && e.shiftKey && (e.key === 'L' || e.key === 'l')) {
+        e.preventDefault();
+        setIsSnippetsOpen(true);
+      }
+      // Cmd/Ctrl + / -> Shortcuts Help
+      else if (isCmdOrCtrl && e.key === '/') {
+        e.preventDefault();
+        setIsShortcutsOpen(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code, selectedLang, stdin]);
+
   return (
     <div className="main-layout">
       <Navbar 
@@ -233,10 +383,15 @@ export default function Home() {
         onRun={handleRun}
         onShare={handleShare}
         onFormat={handleFormat}
+        onOpenSnippets={() => setIsSnippetsOpen(true)}
+        onDownload={handleDownload}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
         onSaveGist={() => showToast('Saved as GitHub Gist!', 'success')}
         onPushRepo={() => showToast('Pushed to GitHub repository!', 'success')}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onShareSession={handleShareSession}
+        theme={settings.theme}
+        onToggleTheme={handleToggleTheme}
         roomActive={roomActive}
         collaboratorsCount={collaboratorsCount}
         isRunning={isRunning}
@@ -244,21 +399,34 @@ export default function Home() {
 
       <main className="content-grid">
         <div className="editor-section">
-          <Editor 
-            language={selectedLang.monaco} 
-            value={code} 
-            onChange={(val) => setCode(val || '')} 
-            onMount={(editor) => setEditorInstance(editor)}
-            settings={settings}
+          <EditorTabs 
+            tabs={tabs}
+            activeTabId={activeTabId}
+            onSelectTab={(id) => setActiveTabId(id)}
+            onAddTab={handleAddTab}
+            onCloseTab={handleCloseTab}
           />
+          <div className="editor-wrapper">
+            <Editor 
+              language={selectedLang.monaco} 
+              value={code} 
+              onChange={(val) => updateActiveTabCode(val || '')} 
+              onMount={(editor) => setEditorInstance(editor)}
+              settings={settings}
+            />
+          </div>
         </div>
         
         <div className="output-section">
           <OutputPane 
             output={output} 
             stderr={stderr}
-            isError={isError} 
-            onClear={() => { setOutput(''); setStderr(''); setIsError(false); }} 
+            isError={isError}
+            timeMs={timeMs}
+            compilerInfo={compilerInfo}
+            stdin={stdin}
+            onStdinChange={(val) => setStdin(val)}
+            onClear={() => { setOutput(''); setStderr(''); setIsError(false); setTimeMs(undefined); }} 
           />
         </div>
       </main>
@@ -268,6 +436,18 @@ export default function Home() {
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onUpdate={(newSettings) => setSettings({ ...settings, ...newSettings })}
+      />
+
+      <SnippetsModal 
+        isOpen={isSnippetsOpen}
+        onClose={() => setIsSnippetsOpen(false)}
+        onSelectSnippet={handleSelectSnippet}
+        currentLangId={selectedLang.id}
+      />
+
+      <ShortcutsModal 
+        isOpen={isShortcutsOpen}
+        onClose={() => setIsShortcutsOpen(false)}
       />
 
       {/* Toast Notification Container */}
@@ -281,10 +461,11 @@ export default function Home() {
       </div>
 
       <style jsx>{`
-        .main-layout { display: flex; flex-direction: column; height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; }
+        .main-layout { display: flex; flex-direction: column; height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; background: var(--background); }
         .content-grid { flex: 1; display: grid; grid-template-columns: 1fr 30%; min-width: 0; min-height: 0; }
-        .editor-section { min-height: 0; min-width: 0; border-right: 1px solid var(--surface-border); }
-        .output-section { min-height: 0; min-width: 0; background: #000; }
+        .editor-section { display: flex; flex-direction: column; min-height: 0; min-width: 0; border-right: 1px solid var(--surface-border); }
+        .editor-wrapper { flex: 1; min-height: 0; min-width: 0; }
+        .output-section { min-height: 0; min-width: 0; background: var(--console-bg); }
         
         .toast-container {
           position: fixed;
@@ -302,12 +483,12 @@ export default function Home() {
           max-width: 400px;
           padding: 12px 16px;
           border-radius: 12px;
-          background: rgba(18, 18, 18, 0.85);
+          background: var(--toast-bg);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-          color: #fff;
+          border: 1px solid var(--glass-border);
+          box-shadow: var(--dropdown-shadow);
+          color: var(--toast-color);
           font-size: 0.875rem;
           display: flex;
           align-items: center;
@@ -317,10 +498,10 @@ export default function Home() {
           transition: all 0.2s ease-out;
         }
         .toast-card.success {
-          border-left: 4px solid #10b981;
+          border-left: 4px solid var(--success);
         }
         .toast-card.error {
-          border-left: 4px solid #ef4444;
+          border-left: 4px solid var(--error);
         }
         .toast-card.info {
           border-left: 4px solid #3b82f6;
@@ -338,7 +519,7 @@ export default function Home() {
           line-height: 1;
         }
         .toast-close:hover {
-          color: #fff;
+          color: var(--foreground);
         }
         @keyframes slideInRight {
           from {

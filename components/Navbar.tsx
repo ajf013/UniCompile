@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Play, Share2, Settings, Terminal, Github, User, Wand2, LogOut, FileCode, PlusCircle, Users } from 'lucide-react';
+import { Play, Share2, Settings, Terminal, Github, User, Wand2, LogOut, FileCode, PlusCircle, Users, Sun, Moon, BookOpen, Download, Keyboard } from 'lucide-react';
 import { SUPPORTED_LANGUAGES } from '@/lib/execution';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import styles from './Navbar.module.css';
@@ -12,10 +12,15 @@ interface NavbarProps {
   onRun: () => void;
   onShare: () => void;
   onFormat: () => void;
+  onOpenSnippets: () => void;
+  onDownload: () => void;
+  onOpenShortcuts: () => void;
   onSaveGist: () => void;
   onPushRepo: () => void;
   onOpenSettings: () => void;
   onShareSession: () => void;
+  theme: string;
+  onToggleTheme: () => void;
   roomActive: boolean;
   collaboratorsCount: number;
   isRunning: boolean;
@@ -27,16 +32,22 @@ export default function Navbar({
   onRun, 
   onShare,
   onFormat,
+  onOpenSnippets,
+  onDownload,
+  onOpenShortcuts,
   onSaveGist,
   onPushRepo,
   onOpenSettings,
   onShareSession,
+  theme,
+  onToggleTheme,
   roomActive,
   collaboratorsCount,
   isRunning
 }: NavbarProps) {
   const { data: session } = useSession();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const isLightTheme = theme === 'light';
 
   return (
     <nav className={`${styles.navbar} glass`}>
@@ -58,6 +69,11 @@ export default function Navbar({
           ))}
         </select>
 
+        <button className="btn btn-secondary" onClick={onOpenSnippets} title="Templates & Algorithm Library">
+          <BookOpen size={18} />
+          <span>Templates</span>
+        </button>
+
         <button className="btn btn-secondary" onClick={onFormat} title="Format Code">
           <Wand2 size={18} />
           <span>Format</span>
@@ -70,6 +86,10 @@ export default function Navbar({
       </div>
 
       <div className={styles.actions}>
+        <button className={styles.iconBtn} onClick={onDownload} title="Download Source File">
+          <Download size={20} />
+        </button>
+
         <button 
           className={`${styles.iconBtn} ${roomActive ? styles.collabBtnActive : ''}`} 
           onClick={onShareSession} 
@@ -81,6 +101,19 @@ export default function Navbar({
 
         <button className={styles.iconBtn} onClick={onShare} title="Copy Share Link">
           <Share2 size={20} />
+        </button>
+
+        <button 
+          className={styles.iconBtn} 
+          onClick={onToggleTheme} 
+          title={isLightTheme ? "Switch to Dark Mode" : "Switch to Light Mode"}
+          aria-label={isLightTheme ? "Switch to Dark Mode" : "Switch to Light Mode"}
+        >
+          {isLightTheme ? <Moon size={20} /> : <Sun size={20} />}
+        </button>
+
+        <button className={styles.iconBtn} onClick={onOpenShortcuts} title="Keyboard Shortcuts (⌘/)">
+          <Keyboard size={20} />
         </button>
         
         {session ? (

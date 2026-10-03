@@ -2,29 +2,86 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #000;
+  background: var(--console-bg);
   border-left: 1px solid var(--surface-border);
+  transition: background-color 0.3s ease;
 }
 
 .header {
-  height: 40px;
+  height: 42px;
   background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1rem;
+  padding: 0 0.75rem;
   border-bottom: 1px solid var(--surface-border);
+  gap: 0.5rem;
 }
 
-.title {
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tabBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tabBtn:hover {
+  background: var(--surface-hover);
+  color: var(--foreground);
+}
+
+.tabBtn.active {
+  background: var(--glass-bg);
+  border-color: var(--surface-border);
+  color: var(--foreground);
+}
+
+.headerRight {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.75rem;
+}
+
+.badge {
+  font-size: 0.7rem;
   font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.badgeSuccess {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badgeError {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--error);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badgeTime {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
 .clearBtn {
@@ -37,6 +94,7 @@
   justify-content: center;
   padding: 4px;
   border-radius: 4px;
+  transition: all 0.15s;
 }
 
 .clearBtn:hover {
@@ -47,7 +105,7 @@
 .content {
   flex: 1;
   overflow: auto;
-  padding: 1.5rem;
+  padding: 1.25rem;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.875rem;
   line-height: 1.6;
@@ -57,13 +115,15 @@
   color: var(--text-muted);
   height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+  gap: 0.5rem;
 }
 
 .stdout {
-  color: #fff;
+  color: var(--console-text);
   white-space: pre-wrap;
 }
 
@@ -77,6 +137,67 @@
   margin-top: 0.5rem;
   padding-top: 0.5rem;
   border-top: 1px dashed rgba(239, 68, 68, 0.3);
+}
+
+.stdinContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stdinLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: sans-serif;
+}
+
+.stdinTextarea {
+  flex: 1;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  color: var(--console-text);
+  border-radius: 8px;
+  padding: 0.8rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  resize: none;
+  outline: none;
+}
+
+.stdinTextarea:focus {
+  border-color: var(--accent);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  font-family: sans-serif;
+}
+
+.statCard {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.statTitle {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--foreground);
 }
 
 .errorBanner {
