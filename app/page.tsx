@@ -449,8 +449,17 @@ export default function Home() {
   };
 
   const handleApplyAiFix = (newFixedCode: string) => {
+    const origLines = code.split('\n');
+    const newLines = newFixedCode.split('\n');
+    let added = 0, removed = 0;
+    const origSet = new Set(origLines.map(l => l.trim()));
+    const newSet = new Set(newLines.map(l => l.trim()));
+    newLines.forEach(l => { if (l.trim() && !origSet.has(l.trim())) added++; });
+    origLines.forEach(l => { if (l.trim() && !newSet.has(l.trim())) removed++; });
+
     updateActiveTabCode(newFixedCode);
-    showToast('Applied AI fix code to editor!', 'success');
+    const summary = added || removed ? ` (+${added} / -${removed} lines)` : '';
+    showToast(`Applied AI fix${summary} to editor!`, 'success');
   };
 
   // Global Keyboard Shortcuts
@@ -584,6 +593,9 @@ export default function Home() {
         complexity={aiComplexity}
         suggestions={aiSuggestions}
         fixedCode={aiFixedCode}
+        originalCode={code}
+        language={selectedLang.id}
+        theme={settings.theme}
         onApplyFix={handleApplyAiFix}
       />
 

@@ -18,8 +18,8 @@
 
 .modal {
   width: 100%;
-  max-width: 680px;
-  max-height: 85vh;
+  max-width: 860px;
+  max-height: 88vh;
   border-radius: 20px;
   overflow: hidden;
   display: flex;
@@ -97,10 +97,44 @@
   border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
+.badgeAdded {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.badgeRemoved {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
 .section {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .sectionTitle {
@@ -112,6 +146,40 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.diffControls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--surface);
+  padding: 0.25rem;
+  border-radius: 10px;
+  border: 1px solid var(--surface-border);
+}
+
+.diffTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.diffTabActive {
+  background: var(--surface-border);
+  color: var(--foreground);
+}
+
+.diffTab:hover:not(.diffTabActive) {
+  color: var(--foreground);
 }
 
 .textBlock {
@@ -148,16 +216,52 @@
   font-weight: bold;
 }
 
-.codePreview {
+.diffEditorContainer {
+  height: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--surface-border);
+  background: var(--console-bg);
+}
+
+.lineDiffContainer {
   background: var(--console-bg);
   border: 1px solid var(--surface-border);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 0.75rem 0;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
+  font-size: 0.83rem;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.diffLine {
+  display: flex;
+  padding: 0.2rem 1rem;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.diffLineAdded {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+.diffLineRemoved {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  text-decoration: line-through;
+}
+
+.diffLineUnchanged {
   color: var(--console-text);
-  overflow-x: auto;
-  max-height: 250px;
+}
+
+.diffSign {
+  display: inline-block;
+  width: 1.5rem;
+  user-select: none;
+  font-weight: bold;
 }
 
 .footer {
@@ -187,3 +291,4 @@
   background: var(--accent-hover);
   transform: translateY(-1px);
 }
+
