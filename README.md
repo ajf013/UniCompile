@@ -92,14 +92,14 @@ UniCompile/
 ### Code Execution & STDIN Flow
 ```mermaid
 graph TD
-    A[User types Code & STDIN Input] --> B{Is language offline supported?}
-    B -->|Yes (JS / TS / Python)| C{Is device offline?}
-    C -->|Yes| D[Execute inside browser sandbox via WASM]
-    C -->|No| D
-    B -->|No (C, C++, Rust, Go, etc.)| E{Is device online?}
-    E -->|Yes| F[Send Code + STDIN payload to Wandbox API]
-    E -->|No| G[Display offline warning toast notification]
-    D --> H[Display stdout/stderr & Execution Stats in OutputPane]
+    A["User types Code & STDIN Input"] --> B{"Is language offline supported?"}
+    B -->|"Yes (JS / TS / Python)"| C{"Is device offline?"}
+    C -->|"Yes"| D["Execute inside browser sandbox via WASM"]
+    C -->|"No"| D
+    B -->|"No (C, C++, Rust, Go, etc.)"| E{"Is device online?"}
+    E -->|"Yes"| F["Send Code + STDIN payload to Wandbox API"]
+    E -->|"No"| G["Display offline warning toast notification"]
+    D --> H["Display stdout/stderr & Execution Stats in OutputPane"]
     F --> H
 ```
 
