@@ -10,7 +10,7 @@ export interface AIExplainResult {
 }
 
 const ENDPOINT = process.env.AZURE_OPENAI_ENDPOINT || 'https://oai-unicompile-sweden.openai.azure.com/';
-const DEPLOYMENT = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4o';
+const DEPLOYMENT = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-6-luna';
 const API_VERSION = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
 
 function getDecryptedKey(): string {

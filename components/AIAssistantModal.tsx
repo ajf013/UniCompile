@@ -114,7 +114,7 @@ export default function AIAssistantModal({
           {loading ? (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '3rem', gap: '1rem', color: 'var(--text-muted)' }}>
               <Sparkles size={36} className="animate-spin text-indigo-500" style={{ animation: 'spin 1.5s linear infinite' }} />
-              <span style={{ fontSize: '0.95rem', fontWeight: 500 }}>Analyzing code & generating AI insights with Azure GPT-4o...</span>
+              <span style={{ fontSize: '0.95rem', fontWeight: 500 }}>Analyzing code & generating AI insights with Azure GPT-6 Luna...</span>
             </div>
           ) : (
             <>
